@@ -94,7 +94,7 @@ void RawSocket::input(RawSocket *sock) {
 			struct tcphdr *tcph = (struct tcphdr*)(buffer + sizeof(struct iphdr));
 			seg.seq = ntohl(tcph->seq);
 			seg.ack = ntohl(tcph->ack_seq);
-			seg.len = received - sizeof(iphdr) - sizeof(tcphdr);
+			seg.len = received - sizeof(iphdr) - (4*tcph->th_off);
 			if (tcph->syn) {
 				seg.len++;
 			}
@@ -106,7 +106,7 @@ void RawSocket::input(RawSocket *sock) {
             pthread_mutex_lock(&(sock->m_mutex));
 			struct sockaddr_in *temp = (struct sockaddr_in *)&from;
 			temp->sin_port = tcph->source;
-			sock->input_segment_arrives(&seg, buffer + sizeof(iphdr), received - sizeof(iphdr) - sizeof(tcphdr), &local, (struct sockaddr_in *)&from);
+			sock->input_segment_arrives(&seg, buffer + sizeof(iphdr), received - sizeof(iphdr) - (4*tcph->th_off), &local, (struct sockaddr_in *)&from);
             pthread_mutex_unlock(&(sock->m_mutex));
 		} else {
 			free(buffer);
@@ -119,7 +119,7 @@ void RawSocket::input_segment_arrives(tcp_segment_info* seg, uint8_t* buffer, in
     tcp_pcb *pcb, *new_pcb;
     int acceptable = 0;
     struct tcphdr *tcph = (struct tcphdr*)(buffer);
-	uint8_t *data = (buffer + sizeof(tcphdr));
+	uint8_t *data = (buffer + (4*tcph->th_off));
 
     pcb = m_pcb->select(local, foreign);
 	if (!pcb || pcb->state == TCP_STATE_CLOSED) {
@@ -497,6 +497,7 @@ ssize_t RawSocket::output_segment(uint32_t seq, uint32_t ack, uint8_t flags, uin
 	memcpy(pseudogram, (char*)&psh, sizeof(struct pseudo_hdr));
 
 	if (len != 0) {
+		memcpy(buf + sizeof(struct iphdr) + sizeof(struct tcphdr) + OPT_SIZE, data, len);
 		memcpy(pseudogram + sizeof(struct pseudo_hdr), hdr, sizeof(struct tcphdr) + OPT_SIZE + len);
 	} else {
 		memcpy(pseudogram + sizeof(struct pseudo_hdr), hdr, sizeof(struct tcphdr) + OPT_SIZE);
@@ -671,6 +672,9 @@ int RawSocket::connect(int id, struct sockaddr_in foreign) {
         return -1;
     }
 
+	inet_pton(AF_INET, "10.0.0.4", &pcb->local.sin_addr);
+	srand(time(NULL));
+	pcb->local.sin_port = htons(rand() % 65535);
     pcb->foreign = foreign;
     pcb->rcv.wnd = sizeof(pcb->m_buf);
     pcb->iss = random();
@@ -850,13 +854,6 @@ int RawSocket::close(int id) {
 		m_pcb->release(pcb);
 	} else {
 		pthread_cond_broadcast(&pcb->m_cond);
-	}
-	while (pcb->state != TCP_STATE_CLOSED) {
-		clock_gettime(CLOCK_REALTIME, &timeout);
-		timespec_add_nsec(&timeout, 10000000);
-		pcb->m_wait++;
-		pthread_cond_timedwait(&pcb->m_cond, &m_mutex, &timeout);
-		pcb->m_wait--;
 	}
 	pthread_mutex_unlock(&m_mutex);
 	return 0;  
