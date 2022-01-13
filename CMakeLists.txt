@@ -17,12 +17,22 @@ add_library(tcp SHARED
 target_link_libraries(tcp ${CMAKE_THREAD_LIBS_INIT})
 target_include_directories(tcp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(test1 tests/tcp_module_init.cpp)
+add_executable(exchange src/exchange.cpp src/application.cpp src/market.cpp)
+target_link_libraries(exchange ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(exchange tcp)
+target_include_directories(exchange PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_executable(client src/client.cpp)
+target_link_libraries(client ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(client tcp)
+target_include_directories(client PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_executable(test1 tests/tcp_module_init.cpp src/market.cpp)
 target_link_libraries(test1 ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(test1 tcp)
 target_include_directories(test1 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(test2 tests/tcp_module_server.cpp)
+add_executable(test2 tests/tcp_module_server.cpp src/market.cpp)
 target_link_libraries(test2 ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(test2 tcp)
 target_include_directories(test2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -11,11 +11,11 @@ class Order {
         enum Side { buy, sell };
         enum Type { market, limit };
 
-        Order( const std::string& clientId, const std::string& symbol,
-                const std::string& owner, const std::string& target,
+        Order( const std::string& orderToken, const std::string& symbol,
+                const std::string& firm,
                 Side side, Type type, double price, long quantity )
-        : m_clientId( clientId ), m_symbol( symbol ), m_owner( owner ),
-        m_target( target ), m_side( side ), m_type( type ), m_price( price ),
+        : m_orderToken( orderToken ), m_symbol( symbol ), m_firm( firm )
+        , m_side( side ), m_type( type ), m_price( price ),
         m_quantity( quantity )
         {
             m_openQuantity = m_quantity;
@@ -25,10 +25,9 @@ class Order {
             m_lastExecutedQuantity = 0;
         }
 
-        const std::string& getClientID() const { return m_clientId; }
+        const std::string& getOrderToken() const { return m_orderToken; }
         const std::string& getSymbol() const { return m_symbol; }
-        const std::string& getOwner() const { return m_owner; }
-        const std::string& getTarget() const { return m_target; }
+        const std::string& getOwner() const { return m_firm; }
         Side getSide() const { return m_side; }
         Type getType() const { return m_type; }
         double getPrice() const { return m_price; }
@@ -60,10 +59,9 @@ class Order {
         }
 
     private:
-        std::string m_clientId; //firm
+        std::string m_orderToken; //firm
         std::string m_symbol; // stock
-        std::string m_owner;
-        std::string m_target;
+        std::string m_firm;
         Side m_side;
         Type m_type;
         int m_price;
@@ -79,7 +77,7 @@ class Order {
 inline std::ostream& operator<<( std::ostream& ostream, const Order& order )
 {
   return ostream
-         << "ID: " << std::setw( 10 ) << "," << order.getClientID()
+         << "ID: " << std::setw( 10 ) << "," << order.getOrderToken()
          << " OWNER: " << std::setw( 10 ) << "," << order.getOwner()
          << " PRICE: " << std::setw( 10 ) << "," << order.getPrice()
          << " QUANTITY: " << std::setw( 10 ) << "," << order.getQuantity();
