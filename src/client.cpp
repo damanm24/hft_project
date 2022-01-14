@@ -33,12 +33,10 @@ int main(int argc, char** argv) {
     uint8_t buffer[100];
     sock->recieve(fd, buffer, sizeof(accept_order_message));
     std::cout << buffer[0] << std::endl;
-    printf("%c", buffer[0]);
     message.indicator = 'S';
     sock->send(fd, (uint8_t *)&message, sizeof(message));
     sock->recieve(fd, buffer, sizeof(accept_order_message));
     std::cout << buffer[0] << std::endl;
-
     sock->recieve(fd, buffer, sizeof(executed_order_message));
     std::cout << buffer[0] << std::endl;
     sock->close(fd);
