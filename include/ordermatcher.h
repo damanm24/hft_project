@@ -6,7 +6,7 @@
 
 class OrderMatcher
 {
-    typedef std::map < std::string, Market> Markets;
+    typedef std::map <std::string, Market> Markets;
     public:
         bool insert(const Order& order) {
             Markets::iterator itr = m_markets.find(order.getSymbol());
@@ -48,7 +48,7 @@ class OrderMatcher
             return orders.size() != 0;
         }
 
-        void display( std::string symbol ) const
+        void display(std::string symbol) const
         {
             Markets::const_iterator i = m_markets.find( symbol );
             if ( i == m_markets.end() ) return ;

@@ -13,7 +13,7 @@ class Order {
 
         Order( const std::string& orderToken, const std::string& symbol,
                 const std::string& firm,
-                Side side, Type type, double price, long quantity )
+                Side side, Type type, long price, long quantity )
         : m_orderToken( orderToken ), m_symbol( symbol ), m_firm( firm )
         , m_side( side ), m_type( type ), m_price( price ),
         m_quantity( quantity )
@@ -30,19 +30,19 @@ class Order {
         const std::string& getOwner() const { return m_firm; }
         Side getSide() const { return m_side; }
         Type getType() const { return m_type; }
-        double getPrice() const { return m_price; }
+        long getPrice() const { return m_price; }
         long getQuantity() const { return m_quantity; }
 
         long getOpenQuantity() const { return m_openQuantity; }
         long getExecutedQuantity() const { return m_executedQuantity; }
         double getAvgExecutedPrice() const { return m_avgExecutedPrice; }
-        double getLastExecutedPrice() const { return m_lastExecutedPrice; }
+        long getLastExecutedPrice() const { return m_lastExecutedPrice; }
         long getLastExecutedQuantity() const { return m_lastExecutedQuantity; }
 
         bool isFilled() const { return m_quantity == m_executedQuantity; }
         bool isClosed() const { return m_openQuantity == 0; }
 
-        void execute( double price, long quantity )
+        void execute( long price, long quantity )
         {
             m_avgExecutedPrice =
             ( ( quantity * price ) + ( m_avgExecutedPrice * m_executedQuantity ) )
@@ -64,13 +64,13 @@ class Order {
         std::string m_firm;
         Side m_side;
         Type m_type;
-        int m_price;
-        int m_quantity;
+        long m_price;
+        long m_quantity;
 
         long m_openQuantity;
         long m_executedQuantity;
         double m_avgExecutedPrice;
-        double m_lastExecutedPrice;
+        long m_lastExecutedPrice;
         long m_lastExecutedQuantity;
 };
 

@@ -1,4 +1,3 @@
-#include "tcp.h"
 #include "application.h"
 
 #include <arpa/inet.h>
@@ -8,5 +7,7 @@
 
 
 int main() {
-
+    Application app;
+    app.start();
+    return 0;
 }

@@ -552,6 +552,7 @@ int RawSocket::retransmit_queue_add(tcp_pcb* pcb, uint32_t seq, uint8_t flags, u
 	memcpy(datacpy, data, len);
 	gettimeofday(&entry->first, NULL);
 	entry->last = entry->first;
+	entry->data = datacpy;
 	pcb->m_retransmit.push_back(entry);
 	return 0;
 }

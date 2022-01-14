@@ -1,3 +1,5 @@
+#pragma once
+
 #include "stdint.h"
 #include "pthread.h"
 #include <netinet/ip.h>
